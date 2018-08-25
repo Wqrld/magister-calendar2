@@ -13,7 +13,7 @@
 
 /* Require all the modules! */
 var fs = require("fs");
-var Magister = require("magister.js");
+const { default: magister, getSchools } = require('magisterjs2');
 var request = require("request");
 var util = require("util");
 var tools = require("./assets/tools.js");
@@ -244,41 +244,55 @@ function requestNewToken(config, callback) {
  * ================================= */
 
 /* Login to Magister. */
-function magisterLogin() {
-  new Magister.Magister({
-    school: {url: CONFIG.magister_url},
+async function magisterLogin() {
+ // console.log(await getSchools("https://novum.magister.net"));
+  getSchools(CONFIG.magister_url).then((schools) => schools[0])
+
+  .then((school) => magister({ // login
+    school,
     username: CONFIG.magister_username,
-    password: CONFIG.magister_password
-  }).ready(function(err) {
-    fetchAppointments(err, this);
+    password: CONFIG.magister_password,
+  })) 
+  .then((m, err) => { // done logging in, say hi
+    fetchAppointments(m);
   });
 }
 
 /* Fetch appointments. */
-function fetchAppointments(err, magisterlogin) {
+function fetchAppointments(magisterlogin, err) {
+  console.log("fetching appointments");
   if (err) {
     tools.log("error", "Could not login to magister.", err);
     process.exit(1);
   }
-  magisterlogin.appointments(new Date(PERIOD.start), new Date(PERIOD.end), false, function(err, appointments) {
+ // console.log(PERIOD.start);
+//  console.log(PERIOD.end);
+ // magisterlogin.appointments(new Date(PERIOD.start), new Date(PERIOD.end)).then(function(appointments){
+  //  console.log(appointments[0])
+  //});
+  magisterlogin.appointments(new Date(PERIOD.start), new Date(PERIOD.end)).then(function(appointments){
+    console.log("got appointment")
     if (err) {
       tools.log("critical", "Problem fetching appointments. ", err);
       process.exit(1);
     }
     // We got the appointments, now let's get the current course info.
+
     fetchCurrentCourse(magisterlogin, appointments, parseAppointments);
   });
 }
 
 /* Fetch current course information. */
 function fetchCurrentCourse(magisterlogin, appointments, callback) {
-  magisterlogin.currentCourse(function(err, currentcourse) {
-    if (err) {
-      tools.log("critical", "Problem fetching current course. ", err);
-      process.exit(1);
-    }
+  console.log("fetching course");
+  magisterlogin.courses().then(function(courses){
+   // if (err) {
+  //    tools.log("critical", "Problem fetching current course. ", err);
+    //  process.exit(1);
+  //  }
     // Callback to parseAppointments.
-    callback(appointments, currentcourse);
+   // console.log(courses[courses.length-1]);
+    callback(appointments, courses[courses.length-1]);
   });
 }
 
@@ -300,9 +314,9 @@ function blacklisted(appointment, i) {
 
 /* Parse appointments. */
 function parseAppointments(appointments, currentcourse) {
-
+console.log("parsing")
   // Save appointment json for debugging purposes.
-  if (DEBUG) {
+ /* if (DEBUG) {
     fs.writeFile(CACHE_PATH + "magister-debug.dump", util.inspect(appointments), function(err) {
       if (err) {
         return tools.log("error", "Problem saving magister debug dump to file.", err);
@@ -312,7 +326,7 @@ function parseAppointments(appointments, currentcourse) {
   }
 
   /* The following block of code is written for a specific school using Magister,
-     because their appointments always have wrong end times. */
+     because their appointments always have wrong end times. 
   if (CONFIG.magister_url.indexOf("dspierson") > -1) {
     // Identify the user as upper or lower class.
     if (currentcourse.group().description >= 4) {
@@ -338,40 +352,45 @@ function parseAppointments(appointments, currentcourse) {
       var secondBreakBegin = ["12", "15"];
     }
   }
-  /* End of special code block. */
+   End of special code block. */
 
   // Loop through every appointment!
+ // console.log(appointments[0]);
+ console.log(appointments.length);
   for (i = 0; i < appointments.length; i++) {
     // Check our blacklist.
-    if (blacklisted(appointments[i], i)) {
-      continue;
-    }
+   // if (blacklisted(appointments[i], i)) {
+   //   console.log("blacklisted");
+   //   continue;
+
+//    }
 
     // Build the appointment object.
+    console.log("app: ")
     var appointment = {
       "version": "2.0.0",
-      "id": appointments[i].id(),
-      "location": appointments[i].location(),
-      "description": appointments[i].description(),
-      "begin": appointments[i].begin(),
-      "end": appointments[i].end(),
-      "schoolhour": appointments[i].beginBySchoolHour(),
-      "class": appointments[i].classes()[0],
-      "status": appointments[i].status(),
-      "scrapped": appointments[i].scrapped(),
-      "type": appointments[i].type(),
-      "homework": appointments[i].content(),
-      "prefix": "[" + appointments[i].beginBySchoolHour() + "] ",
+      "id": appointments[i].id,
+      "location": appointments[i].location,
+      "description": appointments[i].description,
+      "begin": appointments[i].start,
+      "end": appointments[i].end,
+      "schoolhour": appointments[i].startBySchoolhour,
+      "class": appointments[i].classes[0],
+      "status": appointments[i].status,
+      "scrapped": appointments[i].scrapped,
+      "type": appointments[i].type,
+      "homework": appointments[i].content,
+      "prefix": "[" + appointments[i].startBySchoolHour + "] ",
       "formatted": {}
     };
 
     // Add teacher's name if there is any.
-    if (appointments[i].teachers().length > 0) {
-     appointment.teacher = appointments[i].teachers()[0].fullName();
+    if (appointments[i].teachers.length > 0) {
+     appointment.teacher = appointments[i].teachers[0].fullName;
     }
-
+    console.log(appointment);
     // Check the ID.
-    if (appointments[i].id().length < 7 || appointments[i].id() == -1) {
+    if (appointments[i].id.length < 7 || appointments[i].id == -1) {
       var newid = "i" + new Date(appointment.begin).getTime();
       tools.log("notice", appointment.id + " Appointment has invalid ID, changing to '" + newid + "'.");
       appointment.id = newid;

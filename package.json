@@ -13,11 +13,12 @@
   "license": "MIT",
   "analyze": true,
   "dependencies": {
-    "magister.js": "1.x",
-    "util": "0.10.x",
-    "googleapis": "2.1.x",
     "google-auth-library": "0.9.x",
-    "request": "2.65.x"
+    "googleapis": "2.1.x",
+    "magister.js": "1.x",
+    "magisterjs2": "^2.0.0-alpha1.2",
+    "request": "2.65.x",
+    "util": "0.10.x"
   },
   "repository": {
     "type": "git",

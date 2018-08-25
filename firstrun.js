@@ -36,6 +36,7 @@ var TOKEN_PATH = TOKEN_DIR + "calendar-api.json";
 
 /* Load client secrets from a local file. */
 fs.readFile("client_secret.json", function processClientSecrets(err, content) {
+    
   if (err) {
     console.log('Error loading client secret file: ' + err);
     return;
@@ -45,7 +46,9 @@ fs.readFile("client_secret.json", function processClientSecrets(err, content) {
     return;
   }
   // Authorize a client with the loaded credentials, then call the Google Calendar API.
+  console.log(content)
   authorize(JSON.parse(content), testAuth);
+  
 })
 
 
@@ -63,7 +66,7 @@ function authorize(credentials, callback) {
   var redirectUrl = credentials.web.redirect_uris[0];
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
-
+console.log(clientId);
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, function(err, token) {
     if (err) {

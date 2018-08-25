@@ -5,6 +5,8 @@ client_secret.json
 npm-debug.log
 assets/debug.dump
 assets/token.json
+.config
+.package-lock.json
 *~
 version.sh
 *.psd

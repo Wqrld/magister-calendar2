@@ -377,10 +377,10 @@ console.log("parsing")
       "schoolhour": appointments[i].startBySchoolhour,
       "class": appointments[i].classes[0],
       "status": appointments[i].status,
-      "scrapped": appointments[i].scrapped,
+      "scrapped": appointments[i].isCancelled,
       "type": appointments[i].type,
       "homework": appointments[i].content,
-      "prefix": "[" + appointments[i].startBySchoolHour + "] ",
+      "prefix": "[" + appointments[i].startBySchoolhour + "] ",
       "formatted": {}
     };
 

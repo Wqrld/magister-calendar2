@@ -177,7 +177,5 @@ function testAuth(auth) {
     }
   });
 }
-<<<<<<< HEAD
-=======
+
 // End of Script
->>>>>>> c634a1b4180bc04f2754136e4dd3f93583932f63

@@ -299,8 +299,8 @@ function fetchCurrentCourse(magisterlogin, appointments, callback) {
 /* Check if appointment is blacklisted. */
 function blacklisted(appointment, i) {
   for (b = 0; b < CONFIG.blacklist.length; b++) {
-    if (appointment.description() == CONFIG.blacklist[b]) {
-      tools.log("notice", appointment.id() + " Skipping blacklisted appointment.");
+    if (appointment.description == CONFIG.blacklist[b]) {
+      tools.log("notice", appointment.id + " Skipping blacklisted appointment.");
       return true;
     }
   }
@@ -315,58 +315,21 @@ function blacklisted(appointment, i) {
 /* Parse appointments. */
 function parseAppointments(appointments, currentcourse) {
 console.log("parsing")
-  // Save appointment json for debugging purposes.
- /* if (DEBUG) {
-    fs.writeFile(CACHE_PATH + "magister-debug.dump", util.inspect(appointments), function(err) {
-      if (err) {
-        return tools.log("error", "Problem saving magister debug dump to file.", err);
-      }
-      return tools.log("info", "Saved magister debug dump to file.");
-    });
-  }
-
-  /* The following block of code is written for a specific school using Magister,
-     because their appointments always have wrong end times. 
-  if (CONFIG.magister_url.indexOf("dspierson") > -1) {
-    // Identify the user as upper or lower class.
-    if (currentcourse.group().description >= 4) {
-      // Bovenbouw (4, 5, 6).
-      var group = "bovenbouw";
-      tools.log("info", "Identified logged in user as member of upper classes.");
-      var firstBreakBeginsNow = 3;
-      var secondBreakBeginsNow = 5;
-      var firstBreakBeginTuesday = ["10", "45"];
-      var secondBreakBeginTuesday = ["12", "40"];
-      var firstBreakBegin = ["11", "00"];
-      var secondBreakBegin = ["13", "05"];
-    }
-    else {
-      // Onderbouw (1, 2, 3).
-      var group = "onderbouw";
-      tools.log("info", "Identified logged in user as member of lower classes.");
-      var firstBreakBeginsNow = 2;
-      var secondBreakBeginsNow = 4;
-      var firstBreakBeginTuesday = ["10", "00"];
-      var secondBreakBeginTuesday = ["11", "55"];
-      var firstBreakBegin = ["10", "10"];
-      var secondBreakBegin = ["12", "15"];
-    }
-  }
-   End of special code block. */
+ 
 
   // Loop through every appointment!
- // console.log(appointments[0]);
+ console.log(appointments[0]);
  console.log(appointments.length);
   for (i = 0; i < appointments.length; i++) {
     // Check our blacklist.
-   // if (blacklisted(appointments[i], i)) {
-   //   console.log("blacklisted");
-   //   continue;
+    if (blacklisted(appointments[i], i)) {
+      console.log("blacklisted");
+      continue;
 
-//    }
+   }
 
     // Build the appointment object.
-    console.log("app: ")
+    
     var appointment = {
       "version": "2.0.0",
       "id": appointments[i].id,
@@ -388,40 +351,15 @@ console.log("parsing")
     if (appointments[i].teachers.length > 0) {
      appointment.teacher = appointments[i].teachers[0].fullName;
     }
-    console.log(appointment);
+    
     // Check the ID.
-    if (appointments[i].id.length < 7 || appointments[i].id == -1) {
+    if (appointments[i].id.length < 6 || appointments[i].id == -1) {
       var newid = "i" + new Date(appointment.begin).getTime();
       tools.log("notice", appointment.id + " Appointment has invalid ID, changing to '" + newid + "'.");
       appointment.id = newid;
     }
 
-    /* The following block of code is written for a specific school using Magister,
-       because their appointments always have wrong end times. */
-    if (CONFIG.magister_url.indexOf("dspierson") > -1) {
-      // Check if we need to change end times for this appointment.
-      if (new Date(appointment.begin).getDay() == 2 && appointment.schoolhour == firstBreakBeginsNow) {
-        epoch = new Date(appointment.end).setHours(firstBreakBeginTuesday[0]);
-        epoch = new Date(epoch).setMinutes(firstBreakBeginTuesday[1]);
-        appointment.end = new Date(epoch).toISOString();
-      }
-      else if (new Date(appointment.begin).getDay() == 2 && appointment.schoolhour == secondBreakBeginsNow) {
-        epoch = new Date(appointment.end).setHours(secondBreakBeginTuesday[0]);
-        epoch = new Date(epoch).setMinutes(secondBreakBeginTuesday[1]);
-        appointment.end = new Date(epoch).toISOString();
-      }
-      else if (appointment.schoolhour == firstBreakBeginsNow) {
-        epoch = new Date(appointment.end).setHours(firstBreakBegin[0]);
-        epoch = new Date(epoch).setMinutes(firstBreakBegin[1]);
-        appointment.end = new Date(epoch).toISOString();
-      }
-      else if (appointment.schoolhour == secondBreakBeginsNow) {
-        epoch = new Date(appointment.end).setHours(secondBreakBegin[0]);
-        epoch = new Date(epoch).setMinutes(secondBreakBegin[1]);
-        appointment.end = new Date(epoch).toISOString();
-      }
-    }
-    /* End of special code block. */
+
 
     // Some appointments don't have a schoolhour assigned. This removes the prefix instead of schowing '[null]'
     if(appointment.schoolhour == null){
@@ -569,12 +507,12 @@ function calendarItem(action, appointment, googleconfig, retry) {
     }
   }, function(err, response, body) {
     // Debug response to file.
-    if (DEBUG) fs.writeFile(CACHE_PATH + "appointment_" + appointment.id + "_response_debug.json", JSON.stringify(err) + "\n" + JSON.stringify(response) + "\n" + JSON.stringify(body));
+    if (DEBUG) fs.writeFileSync(CACHE_PATH + "appointment_" + appointment.id + "_response_debug.json", JSON.stringify(err) + "\n" + JSON.stringify(response) + "\n" + JSON.stringify(body));
 
     // Check for request error.
     if (err) {
       return tools.log("error", appointment.id + " Error " + action.slice(0, -1) + "ing appointment.", err);
-      fs.writeFile(CACHE_PATH + "appointment_" + appointment.id + "_request_error.json", JSON.stringify(err) + "\n" + JSON.stringify(response) + "\n" + JSON.stringify(body));
+      fs.writeFileSync(CACHE_PATH + "appointment_" + appointment.id + "_request_error.json", JSON.stringify(err) + "\n" + JSON.stringify(response) + "\n" + JSON.stringify(body));
     }
 
     // Check for response error.
@@ -607,7 +545,7 @@ function calendarItem(action, appointment, googleconfig, retry) {
         // Retry updating/creating appointment.
         tools.log("notice", appointment.id + " Failed to add appointment after trying "+retry/2+" times, retrying in 2 seconds.");
         setTimeout(function() {
-          calendarItem(action, appointment, googleconfig, retry+2);
+          calendarItem(action, appointment, googleconfig, retry+4);
         }, retry*1000);
       }
 

@@ -1,20 +1,21 @@
 {
-  "debug": false,
+  "debug": true,
   "calendar": "primary",
   "period": "default",
   "day_is_over_time": 16,
-  "magister_url": "",
-  "magister_username": "",
-  "magister_password": "",
+  "magister_url": "novum",
+  "magister_username": "n400692",
+  "magister_password": "pizzataart",
   "pushover": {
-    "enabled": false,
+    "enabled": true,
     "token": "",
-    "user": "",
+    "user": "ukxk6g925w8423du3qtvrx5y7once6",
     "device": ""
   },
   "remove_cancelled_classes": true,
-  "blacklist": ["", "KWT"],
+  "blacklist": ["N2", "KWT", ""],
   "reminders": [
     { "method": "popup", "minutes": "5" }
   ]
 }
+

@@ -14,7 +14,7 @@
 ## Requirements
 - Unix environment (For example Ubuntu, CentOS or Debian)
 - NodeJS server (`nodejs` and the node package manager `npm`)
-- Cronjob (`crontab` or some other cron program)
+- Cronjob (`crontab` or some other cron program) on linux for automating the running of this script. 
 - A Google account
 - Basic programming knowledge and common sense
 
@@ -24,11 +24,11 @@ Although this project wasn't built for it, Magister Calendar can also run on And
 Make sure that all requirements are present on your system.
 
 ### 1. Enable the Google Calendar API
-Before being able to use Magister Calendar, you'll have to enable the Google Calendar API through the Google Developer Console. [This tutorial](https://github.com/lesander/magister-calendar/blob/master/ENABLEAPI.md) I wrote will help you get through the maze of Google's Developer Console.
+Before being able to use Magister Calendar, you'll have to enable the Google Calendar API through the Google Developer Console. [This tutorial](https://github.com/Wqrld/magister-calendar2/blob/master/ENABLEAPI.md) I wrote will help you get through the maze of Google's Developer Console.
 
 ### 2. Download Magister Calendar
 
-You can download the latest release [here](https://github.com/lesander/magister-calendar/releases), or do a `git clone https://github.com/lesander/magister-calendar.git`. Extract the project in a folder and put the earlier downloaded `client_secret.json` in the same directory.
+You can download the latest release by doing a `git clone https://github.com/lesander/magister-calendar.git`. Extract the project in a folder and put the earlier downloaded `client_secret.json` in the same directory.
 Your working directory should look somewhat like this:
 ```
 ├── assets/
@@ -51,6 +51,7 @@ Awesome, you're almost ready to start using Magister Calendar. The last thing we
 The script will produce an authorization URL you will need to visit in your browser. Click the link and then proceed to login with your Google account. After authorizing your application, you will be redirected to the redirect URL you provided earlier, with an access token attatched to it. Copy that access token and paste it in the terminal running the firstrun.js script. When it's done obtaining the access and refresh token, you're all set with all the Google authentication stuff.
 
 ### 4. Configuring Magister Calendar
+Before you get started, rename `config.json.dist` to `config.json`.
 The main configuration file of Magister Calendar is called `config.json` and uses JSON (duuh). You can change the settings to your liking, I'll explain some of the options here.
 
 ```json
@@ -119,12 +120,13 @@ The default [`config.json`](config.json) file can be found in the root of the pr
 Please note that before setting up a cronjob, it'd be clever to try out Magister Calendar with your configuration manually, by running `nodejs /path/to/magister-calendar.js` and checking the result for any thrown notices, warnings and errors.
 
 ### 5. Setting up the cronjob
-Open your favourite cronjob manager and add the command `nodejs /path/to/magister-calendar.js` to the cron file. You should not make the cronjob run more than once per minute, because Magister Calendar can take up to a minute to finish executing.
+
+#### this only works on linux or any other platform that allows for cronjobs
+Open your favourite cronjob manager and add the command `node /path/to/magister-calendar.js` to the cron file. You should not make the cronjob run more than once per 5 minutes, because Magister Calendar can take up to a a couple minutes to finish executing.
 
 In this example, we'll be using `crontab`, one of the most common cronjob managers. To start editing your cron file, run `crontab -e`. Add the following line at the end of the file to execute Magister Calendar every minute:
 `*/1 * * * * cd /path/to/magister-calendar; nodejs magister-calendar.js > cron.log`. For more on the crontab syntax, [see this article](http://www.adminschoice.com/crontab-quick-reference) or run `man crontab` in a terminal.
 
-:warning: Note that when using JXcore on Android, you'll have to manually set your `HOME` path before running Magister Calendar. You can either permanently set this in your `~/.profile`, or define it every time before running Magister Calendar: `HOME=/my/home/directory jx magister-calendar.js`.
 
 ## Using Magister Calendar
 Once you've got the cronjob up and running (or ran `magister-calendar.js` successfully at least once), you can check your filled in calendar at [Google Calendar](https://google.com/calendar) or on your favourite calendar application synced with Google Calendar.
@@ -133,9 +135,9 @@ Once you've got the cronjob up and running (or ran `magister-calendar.js` succes
 
 ## Contributing
 
-If you'd like to contribute to Magister Calendar or file a bug or feature request, please head over to [the issue tracker](https://github.com/lesander/magister-calendar/issues) or [open a pull request](https://github.com/lesander/magister-calendar/compare/).
+If you'd like to contribute to Magister Calendar or file a bug or feature request, please head over to [the issue tracker](https://github.com/Wqrld/magister-calendar2/issues) or [open a pull request](https://github.com/Wqrld/magister-calendar2/compare/).
 
-:warning: __Please note__ that before opening a new issue, make sure that you're using the __latest version__ of [MagisterJS](https://github.com/simplyGits/MagisterJS), since a lot of problems with logging in to Magister have to do with outdated versions of that package. To update, run `npm install magister.js --save` inside the folder where you have Magister Calendar installed.
+:warning: __Please note__ that before opening a new issue, make sure that you're using the __latest version__ of [MagisterJS2](https://github.com/Wqrld/MagisterJS2), since a lot of problems with logging in to Magister have to do with outdated versions of that package. To update, run `npm install magisterjs2 --save` inside the folder where you have Magister Calendar installed.
 
 ## License & Disclaimer
 This software is open-sourced under the MIT Licence (see [LICENSE](LICENSE) for the full license). So within some limits, you can do with the code whatever you want. However, if you like and/or want to re-use it, I'd really appreciate a reference to this project page.

@@ -544,14 +544,14 @@ function calendarItem(action, appointment, googleconfig, retry) {
           var retry = 0;
         }
 
-        // Only retry 10 times.
-        if (retry/2 >= 10) {
+        // Only retry 4 times.
+        if (retry/2 >= 4) {
           tools.log("notice", appointment.id + " Failed to add appointment after trying 10 times.");
           return false;
         }
 
         // Retry updating/creating appointment.
-        tools.log("notice", appointment.id + " Failed to add appointment after trying "+retry/2+" times, retrying in 2 seconds.");
+        tools.log("notice", appointment.id + " Failed to add appointment after trying "+retry/4+" times, retrying in 4 seconds.");
         setTimeout(function() {
 
           calendarItem(action, appointment, googleconfig, retry+4);
